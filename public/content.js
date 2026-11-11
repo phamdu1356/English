@@ -75,7 +75,7 @@ export function dailyTasks(week, dayOfWeek) {
     return [
       { id: "review", label: "Ôn toàn bộ thẻ từ vựng đến hạn", min: 20, link: "#/vocab" },
       { id: "mistakes", label: "Đọc lại Sổ lỗi sai, viết lại 5 câu đã sửa", min: 20, link: "#/mistakes" },
-      { id: week >= 8 ? "fulltest" : "minitest", label: week >= 8 ? "Thi thử: 1 Reading + 1 Listening + 1 Task 2 + Speaking giám khảo AI" : "Mini test: 1 Reading + 1 Listening AI tạo", min: week >= 8 ? 150 : 60, link: "#/reading" },
+      { id: week >= 8 ? "fulltest" : "minitest", label: week >= 8 ? "Thi thử ĐỀ THẬT: 1 Listening + 1 Reading (Cambridge/chính thức) + 1 Task 2 + Speaking giám khảo AI" : "Mini test: 1 Reading + 1 Listening AI tạo", min: week >= 8 ? 150 : 60, link: week >= 8 ? "#/real" : "#/reading" },
     ];
   }
   const writing = dayOfWeek % 2 === 1
@@ -270,3 +270,37 @@ export function listeningBand(correct, total) {
   return t.find(([min]) => s >= min)[1];
 }
 export const roundBand = (x) => Math.round(x * 2) / 2;
+
+// Reading General Training (thang 40 câu)
+export function gtReadingBand(correct) {
+  const t = [[40, 9], [39, 8.5], [37, 8], [36, 7.5], [34, 7], [32, 6.5], [30, 6], [27, 5.5], [23, 5], [19, 4.5], [15, 4], [0, 3.5]];
+  return t.find(([min]) => correct >= min)[1];
+}
+
+// ---------------- NGUỒN ĐỀ THẬT (chính thức) ----------------
+// Đề do IELTS/IDP/British Council/Cambridge phát hành. App chỉ liên kết, không sao chép nội dung.
+export const OFFICIAL = [
+  {
+    group: "Đề làm quen chính thức trên máy tính (IDP / IELTS) — định dạng y như thi thật, 40 câu",
+    items: [
+      { kind: "listening", name: "Listening — Familiarisation test (4 phần, 40 câu, ~30 phút)", url: "https://demo-ielts.inspera.com/player/?assessmentRunId=131012334&context=exam#/section/128121996/question/128121965/scorableItem/1", key: "https://assets.ctfassets.net/unrdeg6se4ke/3FAYhbYOQElb7L6r4Rv8DR/8331f2b5f2d50b7489b4c14affb75544/IELTS_familiarisation_test_Listening_answers.pdf" },
+      { kind: "reading", name: "Reading Academic — Familiarisation test (3 passage, 40 câu, 60 phút)", url: "https://demo-ielts.inspera.com/player/?assessmentRunId=131013388&context=exam#/section/128121930/question/128121896/scorableItem/1", key: "https://assets.ctfassets.net/unrdeg6se4ke/2ggjbjdFDSU7xXTp7Eqxjp/ef3ce074fbb5d9e47db8ee4b3ad45cb0/IELTS_familiarisation_test_Reading_answers.pdf" },
+      { kind: "writing", name: "Writing Academic — Familiarisation test (Task 1 + Task 2, 60 phút)", url: "https://demo-ielts.inspera.com/player/?assessmentRunId=131013741&context=exam#/section/128125100/question/128121843/scorableItem/1", key: null },
+      { kind: "speaking", name: "Speaking Part 1 — bản ghi âm mẫu + transcript", url: "https://assets.ctfassets.net/unrdeg6se4ke/i05RGjkPNBP9BFtAJeDdI/8771c7f6ecd7b675e038f7885942c1d4/speakingsamplepart1recording.mp3", key: "https://assets.ctfassets.net/unrdeg6se4ke/2xGGVzn9Uqaw4D2zy3AKkG/ef2348814527d3c1d1273b2d8a1473c0/Free_practice_test_-_Speaking_-_Part_1_-_Prompt___Transcript_-_Global.pdf" },
+    ],
+  },
+  {
+    group: "Trang tổng hợp đề mẫu chính thức",
+    items: [
+      { kind: "all", name: "IDP — IELTS Academic practice test (tất cả kỹ năng)", url: "https://ielts.idp.com/prepare/ielts-academic-practice-test" },
+      { kind: "all", name: "ielts.org — Sample test questions (Academic), có answer key PDF", url: "https://ielts.org/take-a-test/preparation-resources/sample-test-questions/academic-test" },
+      { kind: "all", name: "British Council — Take IELTS: đề luyện miễn phí, IELTS Ready (mock test có chấm)", url: "https://takeielts.britishcouncil.org/take-ielts/prepare" },
+    ],
+  },
+  {
+    group: "Sách đề thi thật (nên mua — nguồn luyện chính cho mục tiêu 8.0)",
+    items: [
+      { kind: "book", name: "Cambridge IELTS 1–20 (Academic): mỗi cuốn 4 đề thi thật đã dùng, có đáp án và bài mẫu. Ưu tiên các cuốn mới nhất (15–20).", url: "https://www.cambridge.org/ielts" },
+    ],
+  },
+];
