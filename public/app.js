@@ -1,4 +1,4 @@
-import { PLACEMENT, PHASES, WEEKS, dailyTasks, VOCAB, WRITING_PROMPTS, SPEAKING, readingBand, listeningBand, roundBand } from "./content.js";
+import { PLACEMENT, PHASES, WEEKS, dailyTasks, VOCAB, WRITING_PROMPTS, SPEAKING, readingBand, listeningBand, gtReadingBand, roundBand, OFFICIAL } from "./content.js";
 
 // ================= Tiện ích =================
 const $ = (s, el = document) => el.querySelector(s);
@@ -143,7 +143,8 @@ routes.placement = (v) => {
   v.innerHTML = `
     <h1>Test đầu vào</h1>
     ${S.placement ? `<div class="card"><b>Kết quả lần trước (${esc(S.placement.date)}):</b> band ước tính <b>${S.placement.band}</b>. ${esc(S.placement.summary || "")}</div>` : ""}
-    <p class="muted">3 phần: Ngữ pháp & từ vựng (20 câu, ~10 phút) · Reading (6 câu, ~10 phút) · Writing ngắn (20 phút, AI chấm). Không tra từ điển để kết quả chính xác.</p>
+    <p class="muted">Bài sàng lọc nhanh: Ngữ pháp & từ vựng (20 câu) · Reading (6 câu) · Writing (20 phút, AI chấm). Câu sai bị trừ điểm như đoán bừa — không biết thì để trống. Band tổng chỉ được tính khi có cả Writing.</p>
+    <div class="notice">Muốn biết trình độ thật: làm <a href="#/real">đề chính thức 40 câu</a> (Listening + Reading) — đó mới là điểm xuất phát đáng tin.</div>
     ${aiNotice()}
     <form id="pt">
       <div class="card"><h2 style="margin-top:0">1. Ngữ pháp & từ vựng</h2>
@@ -165,30 +166,49 @@ routes.placement = (v) => {
   $("#pt", v).addEventListener("submit", async (e) => {
     e.preventDefault();
     const val = (n) => { const c = $(`input[name="${n}"]:checked`, v); return c ? Number(c.value) : -1; };
-    let gv = 0; mcq.forEach((x, i) => { const a = val("m" + i); if (a === x.a) gv++; $$(`input[name="m${i}"]`, v).forEach((r) => r.parentElement.classList.toggle("right", Number(r.value) === x.a)); if (a >= 0 && a !== x.a) $(`input[name="m${i}"][value="${a}"]`, v).parentElement.classList.add("wrong"); });
-    let rd = 0; P.reading.questions.forEach((x, i) => { const a = val("r" + i); if (a === x.a) rd++; $$(`input[name="r${i}"]`, v).forEach((r) => r.parentElement.classList.toggle("right", Number(r.value) === x.a)); if (a >= 0 && a !== x.a) $(`input[name="r${i}"][value="${a}"]`, v).parentElement.classList.add("wrong"); });
-    const gvBand = roundBand(Math.min(9, 4 + gv * 0.25));
-    const rdBand = readingBand(rd, P.reading.questions.length);
-    let wr = null;
-    if (AI && wc(ta.value) >= 60) {
+    // Chấm có trừ điểm đoán bừa: mỗi câu sai trừ 1/(số lựa chọn − 1) câu đúng → chọn ngẫu nhiên kỳ vọng ≈ 0 điểm.
+    const score = (items, prefix) => {
+      let right = 0, wrong = 0, blank = 0, adj = 0;
+      items.forEach((x, i) => {
+        const a = val(prefix + i);
+        $$(`input[name="${prefix}${i}"]`, v).forEach((r) => r.parentElement.classList.toggle("right", Number(r.value) === x.a));
+        if (a < 0) { blank++; return; }
+        if (a === x.a) { right++; adj += 1; }
+        else { wrong++; adj -= 1 / (x.o.length - 1); $(`input[name="${prefix}${i}"][value="${a}"]`, v).parentElement.classList.add("wrong"); }
+      });
+      return { right, wrong, blank, adj: Math.max(0, adj) };
+    };
+    const g = score(mcq, "m"), r = score(P.reading.questions, "r");
+    const gvBand = g.adj < 2 ? 4 : roundBand(4 + (5 * g.adj) / mcq.length);
+    const rdBand = r.adj < 1 ? 4 : readingBand(r.adj, P.reading.questions.length);
+    const words = wc(ta.value);
+    let wr = null, wrNote = "";
+    if (words < 60) wrNote = `chưa chấm — bài chỉ có ${words} từ (đề yêu cầu ≥ 150; thi thật bài quá ngắn thường chỉ được band 3–4)`;
+    else if (!AI) wrNote = "chưa chấm — cần bật giáo viên AI";
+    else {
       $("#pt-msg", v).textContent = "Giáo viên AI đang chấm Writing… (khoảng 30–60 giây)";
       try { wr = await api("grade-writing", { task: "task2", prompt: P.writingPrompt, essay: ta.value, minutes: 20 }); }
-      catch (err) { $("#pt-msg", v).textContent = "Không chấm được Writing: " + err.message; }
+      catch (err) { wrNote = "không chấm được: " + err.message; }
     }
     $("#pt-msg", v).textContent = "";
-    const parts = [gvBand, rdBand, ...(wr ? [wr.overall_band] : [])];
-    const band = roundBand(parts.reduce((a, b) => a + b, 0) / parts.length);
-    const gap = Math.max(0, 8 - band);
-    const summary = gap <= 0.5 ? "Bạn đã gần 8.0 — tập trung luyện đề và tinh chỉnh Writing/Speaking." : gap <= 1.5 ? "Khoảng cách vừa phải — lộ trình 12 tuần phù hợp, cần đều đặn 2.5h/ngày." : "Khoảng cách lớn (>1.5 band) — 3 tháng là rất tham vọng; ưu tiên ngữ pháp nền và từ vựng ở giai đoạn 1, cân nhắc mục tiêu trung gian 7.0.";
-    S.placement = { date: today(), band, gv, rd, writing: wr?.overall_band ?? null, summary };
-    recordBand("reading", rdBand);
+    // Chỉ đưa ra band tổng khi có đủ phần Writing — trắc nghiệm ngắn một mình luôn bị thổi phồng.
+    const band = wr ? roundBand((gvBand + rdBand + wr.overall_band) / 3) : null;
+    const ref = band ?? Math.min(gvBand, rdBand);
+    const gap = Math.max(0, 8 - ref);
+    const summary = !wr
+      ? "Chưa đủ dữ liệu để ước tính band tổng (thiếu Writing). Để có điểm xuất phát đáng tin, hãy làm đề Listening + Reading chính thức 40 câu ở mục Đề thật."
+      : gap <= 0.5 ? "Bạn đã gần 8.0 — tập trung luyện đề và tinh chỉnh Writing/Speaking." : gap <= 1.5 ? "Khoảng cách vừa phải — lộ trình 12 tuần phù hợp, cần đều đặn 2.5h/ngày." : "Khoảng cách lớn (>1.5 band) — 3 tháng là rất tham vọng; ưu tiên ngữ pháp nền và từ vựng ở giai đoạn 1, cân nhắc mục tiêu trung gian 7.0.";
+    const guessy = g.wrong >= g.right || g.blank + r.blank > 5;
+    S.placement = { date: today(), band, gv: g.right, rd: r.right, writing: wr?.overall_band ?? null, summary };
     if (wr) { recordBand("writing", wr.overall_band); addMistakes("Test đầu vào", wr.mistakes); }
     save();
+    const line = (name, s, n, b) => `<li>${name}: ${s.right} đúng · ${s.wrong} sai · ${s.blank} bỏ trống / ${n} → điểm sau khi trừ đoán bừa ${s.adj.toFixed(1)} (≈ band ${b})</li>`;
     $("#pt-result", v).innerHTML = `<div class="card"><h2 style="margin-top:0">Kết quả</h2>
-      <div class="row"><div class="band">${band}</div><div><b>Band ước tính</b><br><small>Mục tiêu 8.0 · còn thiếu ${gap.toFixed(1)}</small></div></div>
-      <ul><li>Ngữ pháp & từ vựng: ${gv}/20 (≈ ${gvBand})</li><li>Reading: ${rd}/6 (≈ ${rdBand})</li><li>Writing: ${wr ? wr.overall_band : "chưa chấm (cần AI và ≥ 60 từ)"}</li></ul>
+      ${band != null ? `<div class="row"><div class="band">${band}</div><div><b>Band ước tính</b><br><small>Mục tiêu 8.0 · còn thiếu ${gap.toFixed(1)}</small></div></div>` : `<p><b>Chưa có band tổng.</b></p>`}
+      ${guessy ? `<div class="notice">Số câu sai/bỏ trống cao — kết quả này cho thấy nền tảng còn yếu hoặc bạn đã đoán. Đừng tin vào một con số đẹp; hãy làm đề thật.</div>` : ""}
+      <ul>${line("Ngữ pháp & từ vựng", g, mcq.length, gvBand)}${line("Reading (mẫu 6 câu)", r, P.reading.questions.length, rdBand)}<li>Writing: ${wr ? wr.overall_band : esc(wrNote)}</li></ul>
       <p>${esc(summary)}</p>${wr ? writingResultHTML(wr) : ""}
-      <a class="btn primary" href="#/">Bắt đầu lộ trình</a></div>`;
+      <div class="row"><a class="btn primary" href="#/real">Làm đề thật (40 câu)</a><a class="btn" href="#/">Về trang hôm nay</a></div></div>`;
     $("#pt-result", v).scrollIntoView({ behavior: "smooth" });
   });
 };
@@ -298,7 +318,7 @@ function speak(text, opts = {}) {
 
 // ================= Trang: Reading =================
 routes.reading = (v) => {
-  v.innerHTML = `<h1>Reading</h1><p class="muted">AI soạn một passage gốc kiểu IELTS Academic + 10 câu hỏi. Làm trong 20 phút, sau đó xem đáp án và giải thích.</p>${aiNotice()}
+  v.innerHTML = `<h1>Reading</h1><div class="notice">Bài AI soạn dùng để luyện dạng câu hỏi. Để đo trình độ thật, làm <a href="#/real">đề chính thức 40 câu</a>.</div><p class="muted">AI soạn một passage gốc kiểu IELTS Academic + 10 câu hỏi. Làm trong 20 phút, sau đó xem đáp án và giải thích.</p>${aiNotice()}
     <div class="card row"><input id="topic" placeholder="Chủ đề (tuỳ chọn): ví dụ marine biology, urban planning…" style="flex:1"><select id="lvl" style="width:auto"><option value="6.5">Độ khó 6.5</option><option value="7.5" selected>Độ khó 7.5</option><option value="8.5">Độ khó 8.5</option></select><button class="primary" id="gen" ${AI ? "" : "disabled"}>Tạo bài</button></div>
     <div id="rz"></div>${historyHTML(S.reading, "Reading")}`;
   $("#gen", v).onclick = async () => {
@@ -373,7 +393,7 @@ function playScript(script, rate, status) {
 
 // ================= Trang: Listening =================
 routes.listening = (v) => {
-  v.innerHTML = `<h1>Listening</h1><p class="muted">AI soạn script gốc theo đúng format Section 1–4, trình duyệt đọc to bằng 2 giọng. Nghe 1 lần, điền đáp án, sau đó xem script để chép chính tả đoạn sai.</p>${aiNotice()}
+  v.innerHTML = `<h1>Listening</h1><div class="notice">Giọng đọc máy dễ nghe hơn thi thật. Để đo trình độ thật, làm <a href="#/real">đề Listening chính thức</a>.</div><p class="muted">AI soạn script gốc theo đúng format Section 1–4, trình duyệt đọc to bằng 2 giọng. Nghe 1 lần, điền đáp án, sau đó xem script để chép chính tả đoạn sai.</p>${aiNotice()}
     ${"speechSynthesis" in window ? "" : `<div class="notice">Trình duyệt này không hỗ trợ đọc văn bản — hãy dùng Chrome hoặc Edge.</div>`}
     <div class="card row"><select id="sec" style="width:auto"><option value="1">Section 1 — hội thoại đời sống</option><option value="2">Section 2 — độc thoại đời sống</option><option value="3">Section 3 — thảo luận học thuật</option><option value="4" selected>Section 4 — bài giảng học thuật</option></select><input id="topic" placeholder="Chủ đề (tuỳ chọn)" style="flex:1"><button class="primary" id="gen" ${AI ? "" : "disabled"}>Tạo bài nghe</button></div>
     <div id="lz"></div>${historyHTML(S.listening, "Listening")}`;
@@ -406,6 +426,7 @@ function writingResultHTML(r) {
 }
 routes.writing = (v) => {
   let task = "task2", prompt = pick(WRITING_PROMPTS.task2);
+  if (S.pending?.route === "writing") { ({ task, prompt } = S.pending); S.pending = null; save(); }
   const draw = () => {
     const mins = task === "task1" ? 20 : 40, minWords = task === "task1" ? 150 : 250;
     const draftKey = "draft-" + task;
@@ -452,10 +473,12 @@ routes.writing = (v) => {
 
 // ================= Trang: Speaking =================
 routes.speaking = (v) => {
-  let part = "Part 1";
+  let part = "Part 1", custom = null;
+  if (S.pending?.route === "speaking") { part = S.pending.part; custom = S.pending.prompt; S.pending = null; save(); }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const draw = () => {
-    const q = part === "Part 2" ? pick(SPEAKING.part2) : pick(part === "Part 1" ? SPEAKING.part1 : SPEAKING.part3);
+    const q = custom ?? (part === "Part 2" ? pick(SPEAKING.part2) : pick(part === "Part 1" ? SPEAKING.part1 : SPEAKING.part3));
+    custom = null;
     const qText = typeof q === "string" ? q : `${q.cue}\nYou should say: ${q.points.join("; ")}`;
     const prep = part === "Part 2" ? 60 : 0, talk = part === "Part 1" ? 30 : part === "Part 2" ? 120 : 60;
     v.innerHTML = `<h1>Speaking</h1>${aiNotice()}
@@ -600,6 +623,87 @@ function wireMic(v, target) {
   };
   onLeave(() => rec?.stop());
 }
+
+// ================= Trang: Đề thật (chính thức) =================
+const REAL_KINDS = { listening: "Listening", reading: "Reading Academic", gtreading: "Reading General Training" };
+function realBand(kind, n) { return kind === "listening" ? listeningBand(n, 40) : kind === "gtreading" ? gtReadingBand(n) : readingBand(n, 40); }
+routes.real = (v) => {
+  const keys = (S.keys ||= {});
+  let kind = S.realKind || "listening";
+  const draw = () => {
+    const names = Object.keys(keys).filter((k) => keys[k].kind === kind);
+    v.innerHTML = `<h1>Đề thật</h1>
+      <p class="muted">Đề do IELTS / IDP / British Council / Cambridge phát hành. Làm đề trên trang gốc hoặc trong sách, sau đó nhập đáp án của bạn vào phiếu bên dưới để chấm và quy đổi band theo thang 40 câu chính thức. App chỉ liên kết, không sao chép đề.</p>
+      ${OFFICIAL.map((g) => `<div class="card"><h3>${esc(g.group)}</h3><ul class="tasks">${g.items.map((it) => `<li><span>${esc(it.name)}</span><span class="spacer"></span>
+        <a class="btn small primary" href="${esc(it.url)}" target="_blank" rel="noopener">Mở</a>${it.key ? `<a class="btn small" href="${esc(it.key)}" target="_blank" rel="noopener">Đáp án</a>` : ""}</li>`).join("")}</ul></div>`).join("")}
+
+      <div class="card"><h2 style="margin-top:0">Phiếu trả lời & chấm điểm</h2>
+        <div class="tabs">${Object.entries(REAL_KINDS).map(([k, n]) => `<button data-k="${k}" class="${k === kind ? "on" : ""}">${n}</button>`).join("")}</div>
+        <div class="grid"><div><label>Tên đề (ví dụ: Familiarisation, Cambridge 19 Test 2)</label><input id="tn" list="tnl" value="${esc(S.realLast?.[kind] || "")}"><datalist id="tnl">${names.map((n) => `<option value="${esc(n)}">`).join("")}</datalist></div>
+          <div><label>Hoặc chỉ nhập số câu đúng (/40)</label><div class="row"><input id="quick" type="number" min="0" max="40" style="width:110px"><button id="qsave">Quy đổi & lưu</button></div></div></div>
+        <h3 style="margin-top:16px">Câu trả lời của bạn</h3>
+        <div class="sheet" id="mine">${Array.from({ length: 40 }, (_, i) => `<label><span>${i + 1}</span><input data-i="${i}" autocomplete="off" spellcheck="false"></label>`).join("")}</div>
+        <details id="kd" style="margin-top:14px"><summary><b>Đáp án của đề</b> <small>(nhập 1 lần từ file đáp án/sách — được nhớ theo tên đề; đáp án thay thế viết cách nhau bằng "/", ví dụ <code>colour/color</code>)</small></summary>
+          <div class="row" style="margin:8px 0"><textarea id="paste" style="min-height:60px" placeholder="Dán nhanh: mỗi dòng 1 đáp án theo thứ tự 1→40 (hoặc dạng '1 B', '2. TRUE')"></textarea><button id="fill" class="small">Điền từ ô dán</button></div>
+          <div class="sheet" id="key">${Array.from({ length: 40 }, (_, i) => `<label><span>${i + 1}</span><input data-i="${i}" autocomplete="off" spellcheck="false"></label>`).join("")}</div></details>
+        <div class="row" style="margin-top:14px"><button class="primary" id="mark">Chấm bài</button><span id="rmsg" class="muted"></span></div>
+        <div id="rres"></div></div>
+
+      <div class="card"><h2 style="margin-top:0">Writing & Speaking với đề thật</h2>
+        <p class="muted">Dán nguyên văn đề Writing/Speaking từ sách Cambridge hoặc trang đề chính thức — giám khảo AI sẽ chấm theo đúng đề đó.</p>
+        <div class="row"><select id="wt" style="width:auto"><option value="task2">Writing Task 2</option><option value="task1">Writing Task 1</option><option value="Part 1">Speaking Part 1</option><option value="Part 2">Speaking Part 2</option><option value="Part 3">Speaking Part 3</option></select></div>
+        <textarea id="wp" style="min-height:90px;margin-top:8px" placeholder="Dán đề vào đây…"></textarea>
+        <button class="primary" id="wgo" style="margin-top:8px">Luyện đề này</button></div>
+      ${historyHTML([...S.reading, ...S.listening].filter((x) => x.real), "đề thật")}`;
+    $$(".tabs button", v).forEach((b) => (b.onclick = () => { kind = S.realKind = b.dataset.k; save(); draw(); }));
+    const tn = $("#tn", v);
+    const loadKey = () => { const k = keys[tn.value.trim()]; $$("#key input", v).forEach((inp, i) => (inp.value = k?.answers[i] || "")); if (!k) $("#kd", v).open = true; };
+    tn.addEventListener("change", loadKey); loadKey();
+    $("#fill", v).onclick = () => {
+      const lines = $("#paste", v).value.split(/\n|;/).map((l) => l.trim()).filter(Boolean);
+      const vals = Array(40).fill("");
+      let seq = 0;
+      for (const l of lines) { const m = l.match(/^(\d{1,2})\s*[.):\-]?\s+(.+)$/); if (m && +m[1] >= 1 && +m[1] <= 40) vals[+m[1] - 1] = m[2].trim(); else if (seq < 40) vals[seq] = l; seq = m ? +m[1] : seq + 1; }
+      $$("#key input", v).forEach((inp, i) => vals[i] && (inp.value = vals[i]));
+    };
+    const finish = (correct, name, wrongs = []) => {
+      const band = realBand(kind, correct);
+      const skill = kind === "listening" ? "listening" : "reading";
+      S[skill].push({ date: today(), title: `${name} (${REAL_KINDS[kind]})`, correct, total: 40, band, real: true });
+      recordBand(skill, band);
+      S.realLast = { ...(S.realLast || {}), [kind]: name };
+      for (const w of wrongs) S.mistakes.unshift({ id: crypto.randomUUID(), date: today(), source: `${name} — câu ${w.n}`, category: skill, original: w.mine || "(bỏ trống)", correction: w.key, explanation: "Mở lại đề, tìm đoạn chứa đáp án và ghi lý do sai (paraphrase, bẫy đính chính, NOT GIVEN vs FALSE, chính tả, số ít/nhiều…).", mastered: false });
+      save();
+      const need = kind === "listening" ? 35 : kind === "gtreading" ? 37 : 35;
+      $("#rres", v).innerHTML = `<div class="card" style="margin-top:14px"><div class="row"><div class="band">${band}</div><div><b>${correct}/40 câu đúng · ${esc(REAL_KINDS[kind])}</b><br><small>Mục tiêu 8.0 cần khoảng ${need}/40 — ${correct >= need ? "đã đạt" : `còn thiếu ${need - correct} câu`}.</small></div></div>
+        ${wrongs.length ? `<h3 style="margin-top:14px">Câu sai (${wrongs.length}) — đã thêm vào Sổ lỗi sai</h3><table style="width:100%;border-collapse:collapse">${wrongs.map((w) => `<tr style="border-bottom:1px solid var(--line)"><td style="padding:4px">${w.n}</td><td><del style="color:var(--bad)">${esc(w.mine || "—")}</del></td><td><ins style="color:var(--ok);text-decoration:none">${esc(w.key)}</ins></td></tr>`).join("")}</table>` : ""}</div>`;
+      $("#rres", v).scrollIntoView({ behavior: "smooth" });
+    };
+    $("#qsave", v).onclick = () => {
+      const n = Number($("#quick", v).value); if (!(n >= 0 && n <= 40)) return ($("#rmsg", v).textContent = "Nhập số từ 0 đến 40.");
+      finish(n, tn.value.trim() || "Đề không tên");
+    };
+    $("#mark", v).onclick = () => {
+      const name = tn.value.trim(); if (!name) return ($("#rmsg", v).textContent = "Nhập tên đề trước (để app nhớ đáp án).");
+      const key = $$("#key input", v).map((i) => i.value.trim()), mine = $$("#mine input", v).map((i) => i.value.trim());
+      if (key.filter(Boolean).length < 40) { $("#kd", v).open = true; return ($("#rmsg", v).textContent = `Đáp án mới có ${key.filter(Boolean).length}/40 câu — điền đủ để chấm.`); }
+      keys[name] = { kind, answers: key };
+      const clean = (s) => s.toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+      const ok = (m, k) => { const a = clean(m); if (!a) return false; return k.split("/").some((alt) => { const b = clean(alt); return a === b || (b.length === 1 && a.split(" ")[0] === b); }); };
+      let correct = 0; const wrongs = [];
+      $$("#mine input", v).forEach((inp, i) => { const good = ok(mine[i], key[i]); inp.parentElement.classList.toggle("ok", good); inp.parentElement.classList.toggle("no", !good); if (good) correct++; else wrongs.push({ n: i + 1, mine: mine[i], key: key[i] }); });
+      $("#rmsg", v).textContent = "";
+      finish(correct, name, wrongs);
+    };
+    $("#wgo", v).onclick = () => {
+      const p = $("#wp", v).value.trim(); if (!p) return;
+      const t = $("#wt", v).value;
+      if (t.startsWith("task")) { S.pending = { route: "writing", task: t, prompt: p }; location.hash = "#/writing"; }
+      else { S.pending = { route: "speaking", part: t, prompt: p }; location.hash = "#/speaking"; }
+    };
+  };
+  draw();
+};
 
 // ================= Trang: Sổ lỗi sai =================
 routes.mistakes = (v) => {
