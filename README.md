@@ -30,6 +30,18 @@ npm start
 
 Mở http://localhost:5173 (nên dùng Chrome/Edge để có ghi âm, chép lời và đọc văn bản).
 
+### Icon bấm để mở (Linux)
+
+```bash
+./install-icon.sh
+```
+
+Tạo lối tắt **IELTS 8.0 Coach** trong menu ứng dụng và trên Desktop. Bấm vào: máy chủ tự khởi động (nếu chưa chạy) và trình duyệt mở app. Để icon dùng được giáo viên AI, tạo file `.env` cạnh `server.js`:
+
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
 Không có API key ứng dụng vẫn chạy: lộ trình, test trắc nghiệm, từ vựng SRS, đồng hồ, ghi âm và sổ lỗi đều dùng được; chỉ phần chấm bài và tạo đề cần AI.
 
 ## Ghi chú
