@@ -1,0 +1,13 @@
+{
+  "name": "ielts-8",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Hệ thống tự học IELTS mục tiêu 8.0 với giáo viên AI",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0"
+  }
+}
