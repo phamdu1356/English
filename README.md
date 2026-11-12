@@ -8,8 +8,10 @@ Hệ thống tự học IELTS chạy trên máy (local), lộ trình 12 tuần �
 |---|---|
 | **Hôm nay** | Checklist nhiệm vụ theo ngày/tuần của lộ trình, streak, band ước tính từng kỹ năng |
 | **Test đầu vào** | 20 câu ngữ pháp–từ vựng, 1 bài Reading, 1 bài Writing (AI chấm) → band hiện tại và khoảng cách tới 8.0 |
-| **Lộ trình 12 tuần** | 3 giai đoạn: Nền tảng → Tăng tốc → Về đích; trọng tâm từng tuần |
-| **Từ vựng SRS** | ~100 từ học thuật + từ của bạn; thẻ ghi nhớ (thuật toán SM-2), gõ từ chủ động, nghe phát âm |
+| **Lộ trình 12 tuần** | 3 giai đoạn; mỗi tuần gắn với 1 đề thật Cambridge IELTS 15–20, phần học trong The Official Cambridge Guide to IELTS / Grammar for IELTS / Vocabulary for IELTS, và 1 sublist AWL |
+| **Giáo trình** | Danh sách sách chính, sách bổ trợ và tài nguyên chính thức (band descriptors, AWL, Write & Improve) kèm thời điểm dùng |
+| **Đề thật** | Đề chính thức IDP/IELTS, phiếu trả lời 40 câu, quy đổi band |
+| **Từ vựng SRS** | ~100 từ chủ đề IELTS + Academic Word List Sublist 1–2 (120 từ) + từ của bạn; thẻ ghi nhớ (thuật toán SM-2), gõ từ chủ động, nghe phát âm |
 | **Reading** | AI soạn passage gốc + 10 câu (TFNG, MCQ, completion), bấm giờ, chấm & giải thích, quy đổi band |
 | **Listening** | AI soạn script Section 1–4, trình duyệt đọc to bằng 2 giọng, điền đáp án, xem lại script |
 | **Writing** | Task 1/Task 2, bấm giờ, đếm từ, tự lưu nháp; AI chấm 4 tiêu chí + lỗi + bản viết lại band 8 |

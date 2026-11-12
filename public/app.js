@@ -1,4 +1,4 @@
-import { PLACEMENT, PHASES, WEEKS, dailyTasks, VOCAB, WRITING_PROMPTS, SPEAKING, readingBand, listeningBand, gtReadingBand, roundBand, OFFICIAL } from "./content.js";
+import { PLACEMENT, PHASES, WEEKS, dailyTasks, VOCAB, WRITING_PROMPTS, SPEAKING, readingBand, listeningBand, gtReadingBand, roundBand, OFFICIAL, BOOKS } from "./content.js";
 
 // ================= Tiện ích =================
 const $ = (s, el = document) => el.querySelector(s);
@@ -220,16 +220,35 @@ routes.plan = (v) => {
     <p class="muted">Bắt đầu: ${esc(S.startDate)} · ~2.5 giờ/ngày, 6 ngày học + 1 ngày ôn & thi thử.</p>
     <div class="card"><div class="row"><label style="margin:0">Ngày bắt đầu</label><input type="date" id="sd" value="${esc(S.startDate)}" style="width:auto"><button id="sd-save" class="small">Lưu</button></div></div>
     ${PHASES.map((p) => `<div class="card"><h2 style="margin-top:0">${esc(p.name)}</h2><p class="muted">${esc(p.goal)}</p>
-      ${WEEKS.filter((w) => w.w >= p.weeks[0] && w.w <= p.weeks[1]).map((w) => `<div class="week ${w.w === week ? "now" : ""}"><b>Tuần ${w.w}</b><div>${esc(w.focus)}</div></div>`).join("")}</div>`).join("")}
+      ${WEEKS.filter((w) => w.w >= p.weeks[0] && w.w <= p.weeks[1]).map((w) => `<div class="week ${w.w === week ? "now" : ""}"><b>Tuần ${w.w}</b><div>${esc(w.focus)}
+        <div style="margin-top:4px"><small>📝 Đề thật: ${esc(w.test)}</small><br><small>📘 Giáo trình: ${esc(w.study)}</small>${w.awl ? `<br><small>🔤 Từ vựng: AWL Sublist ${w.awl}</small>` : ""}</div></div></div>`).join("")}</div>`).join("")}
+    <p class="muted">Viết tắt: OCG = The Official Cambridge Guide to IELTS · GFI = Grammar for IELTS · VFI = Cambridge Vocabulary for IELTS Advanced. Xem <a href="#/books">Giáo trình</a>.</p>
     <div class="card"><h3>Khung một ngày học</h3><ul>${dailyTasks(1, 1).map((t) => `<li>${esc(t.label)} — ${t.min} phút</li>`).join("")}</ul>
     <p class="muted">Nguyên tắc band 8: mỗi bài Writing/Speaking đều được AI chấm → lỗi tự vào <a href="#/mistakes">Sổ lỗi sai</a> → ôn lại vào ngày 7. Từ tuần 8, mỗi tuần 1 full test.</p></div>`;
   $("#sd-save", v).onclick = () => { S.startDate = $("#sd", v).value || today(); save(); render(); };
 };
 
+// ================= Trang: Giáo trình =================
+routes.books = (v) => {
+  const { week } = planPos();
+  const W = WEEKS[week - 1];
+  const own = (S.owned ||= {});
+  v.innerHTML = `<h1>Giáo trình</h1>
+    <p class="muted">Bộ tài liệu được chọn theo khuyến nghị phổ biến cho mục tiêu 7.5–8.0: đề thi thật Cambridge làm trục luyện đề, The Official Cambridge Guide to IELTS làm sách chiến lược, cộng tài nguyên chính thức miễn phí. Sách giấy cần mua — app chỉ liên kết, không chứa nội dung sách.</p>
+    <div class="card"><h3>Tuần ${week} của bạn</h3><ul><li><b>Đề thật:</b> ${esc(W.test)}</li><li><b>Học trong sách:</b> ${esc(W.study)}</li>${W.awl ? `<li><b>Từ vựng:</b> AWL Sublist ${W.awl}${W.awl <= 2 ? ` — <a href="#/vocab">có sẵn trong app</a>` : ` — <a href="https://www.wgtn.ac.nz/lals/resources/academicwordlist/sublists" target="_blank" rel="noopener">xem danh sách</a>, thêm từ chưa biết vào bộ thẻ`}</li>` : ""}</ul></div>
+    ${BOOKS.map((g) => `<div class="card"><h3>${esc(g.group)}</h3><ul class="tasks">${g.items.map((it, i) => {
+      const id = g.group + i; const ext = !it.url.startsWith("#");
+      return `<li><input type="checkbox" data-id="${esc(id)}" ${own[id] ? "checked" : ""} aria-label="Đã có"><span><b>${esc(it.name)}</b><br>${esc(it.role)}<br><small>Dùng: ${esc(it.when)}</small></span><span class="spacer"></span><a class="btn small" href="${esc(it.url)}" ${ext ? 'target="_blank" rel="noopener"' : ""}>Mở</a></li>`;
+    }).join("")}</ul></div>`).join("")}
+    <p class="muted">Tích ô bên trái khi bạn đã có tài liệu. Nếu chưa mua được OCG, phần "Giáo trình" mỗi ngày có thể thay bằng: đọc band descriptors + hỏi gia sư AI về dạng bài của tuần.</p>`;
+  $$("input[data-id]", v).forEach((cb) => (cb.onchange = () => { own[cb.dataset.id] = cb.checked; save(); }));
+};
+
 // ================= Trang: Từ vựng SRS (SM-2) =================
 function allWords() { return [...VOCAB, ...S.customWords]; }
 function dueCards() { const t = today(); return allWords().filter((w) => S.srs[w.id] && S.srs[w.id].due <= t); }
-function newCards() { return allWords().filter((w) => !S.srs[w.id]); }
+function newCards() { const d = S.vocabDeck || "all"; return allWords().filter((w) => !S.srs[w.id] && (d === "all" || (w.deck || "Từ của bạn") === d)); }
+function decks() { return [...new Set(allWords().map((w) => w.deck || "Từ của bạn"))]; }
 function grade(w, q) { // q: 0 quên, 3 khó, 4 nhớ, 5 dễ
   const c = S.srs[w.id] || { ef: 2.5, reps: 0, interval: 0 };
   if (q < 3) { c.reps = 0; c.interval = 1; }
@@ -249,10 +268,13 @@ routes.vocab = (v) => {
     const learned = Object.keys(S.srs).length;
     v.innerHTML = `<h1>Từ vựng học thuật (SRS)</h1>
       <p class="muted">Lặp lại ngắt quãng: thẻ nhớ tốt sẽ quay lại sau vài ngày, thẻ quên quay lại ngày mai. Mục tiêu: ôn hết thẻ đến hạn + 15 từ mới/ngày.</p>
-      <div class="grid"><div class="stat"><b>${due.length}</b><span>Đến hạn hôm nay</span></div><div class="stat"><b>${learned}</b><span>Đã học / ${allWords().length}</span></div><div class="stat"><b>${fresh.length}</b><span>Từ mới còn lại</span></div></div>
+      <div class="grid"><div class="stat"><b>${due.length}</b><span>Đến hạn hôm nay</span></div><div class="stat"><b>${learned}</b><span>Đã học / ${allWords().length}</span></div><div class="stat"><b>${fresh.length}</b><span>Từ mới còn lại trong bộ đang chọn</span></div></div>
+      <div class="row" style="margin-top:12px"><label style="margin:0">Lấy từ mới từ bộ</label><select id="deck" style="width:auto"><option value="all">Tất cả</option>${decks().map((d) => `<option ${S.vocabDeck === d ? "selected" : ""}>${esc(d)}</option>`).join("")}</select>
+        <small>AWL = Academic Word List (Coxhead) — <a href="${esc(BOOKS[2].items[2].url)}" target="_blank" rel="noopener">nguồn</a></small></div>
       <div class="tabs" style="margin-top:16px"><button data-m="flash" class="${mode === "flash" ? "on" : ""}">Thẻ ghi nhớ</button><button data-m="type" class="${mode === "type" ? "on" : ""}">Gõ từ (nhớ chủ động)</button><button data-m="list" class="${mode === "list" ? "on" : ""}">Danh sách & thêm từ</button></div>
       <div id="vz"></div>`;
     $$(".tabs button", v).forEach((b) => (b.onclick = () => { mode = b.dataset.m; draw(); }));
+    $("#deck", v).onchange = (e) => { S.vocabDeck = e.target.value; save(); draw(); };
     const z = $("#vz", v);
     const queue = [...due, ...fresh.slice(0, Math.max(0, 15 - todayNewCount()))];
     if (mode === "list") return listMode(z);
