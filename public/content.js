@@ -54,44 +54,100 @@ export const PHASES = [
   { name: "Giai đoạn 3 — Về đích 8.0", weeks: [9, 12], goal: "Thi thử full test, tinh chỉnh từ vựng/collocation band 8, quản lý thời gian và tâm lý." },
 ];
 
+// Mỗi tuần gắn với: đề thật Cambridge (sách "Cambridge IELTS <số> Academic", mỗi cuốn 4 test),
+// phần học trong giáo trình chính (OCG = The Official Cambridge Guide to IELTS; GFI = Grammar for IELTS;
+// VFI = Cambridge Vocabulary for IELTS Advanced), sublist AWL và dạng bài trọng tâm.
 export const WEEKS = [
-  { w: 1, focus: "Thì & cấu trúc câu cơ bản; Reading: skimming/scanning; Task 2: phân tích đề; Speaking Part 1 (bản thân, công việc, quê hương)" },
-  { w: 2, focus: "Câu phức & mệnh đề quan hệ; Reading: TRUE/FALSE/NOT GIVEN; Listening Section 1–2; Task 2 dạng Opinion" },
-  { w: 3, focus: "Bị động & danh từ hoá; Task 1: Line/Bar chart; Speaking Part 2 cấu trúc 4 ý; Listening: bẫy đính chính" },
-  { w: 4, focus: "Mạo từ, giới từ, mạo từ số ít/nhiều; Reading: Matching headings; Task 2 dạng Discussion; Mini test tuần 4" },
-  { w: 5, focus: "Câu điều kiện & đảo ngữ; Task 1: Table/Pie; Speaking Part 3 (giải thích nguyên nhân – hệ quả)" },
-  { w: 6, focus: "Linking & cohesion nâng cao; Reading: Matching information; Listening Section 3; Task 2 Problem–Solution" },
-  { w: 7, focus: "Collocation theo chủ đề (Môi trường, Giáo dục, Công nghệ); Task 1: Process & Map; Speaking Part 2 kể chuyện tự nhiên" },
-  { w: 8, focus: "Hedging & ngôn ngữ học thuật; Listening Section 4; Task 2 Advantages–Disadvantages; Full test #1" },
-  { w: 9, focus: "Chiến lược 60 phút Reading; Writing tốc độ 40 phút; Speaking idioms tự nhiên (không lạm dụng); Full test #2" },
-  { w: 10, focus: "Sửa lỗi lặp lại trong Sổ lỗi sai; Paraphrase nâng cao; Speaking Part 3 phản biện; Full test #3" },
-  { w: 11, focus: "Thi thử điều kiện thật 2 lần; chấm Writing kỹ từng tiêu chí; ôn từ vựng SRS cường độ cao" },
-  { w: 12, focus: "Giảm tải, ôn lỗi sai, ngủ đủ; 1 full test đầu tuần; luyện Speaking nhẹ mỗi ngày; chuẩn bị giấy tờ thi" },
+  { w: 1, focus: "Làm quen format + đo điểm xuất phát; Reading: skimming/scanning; Task 2: phân tích đề; Speaking Part 1",
+    test: "IELTS Familiarisation test (Listening + Reading, trang Đề thật)", study: "OCG: phần giới thiệu bài thi + chương Listening & Reading đầu tiên · GFI: thì hiện tại/quá khứ, hiện tại hoàn thành", awl: 1, rq: "TRUE/FALSE/NOT GIVEN", wt: "task2" },
+  { w: 2, focus: "Câu phức & mệnh đề quan hệ; Reading: TRUE/FALSE/NOT GIVEN; Listening Section 1–2 (form/note completion); Task 2 dạng Opinion",
+    test: "Cambridge IELTS 15 — Test 1", study: "OCG: Listening Part 1–2, Writing Task 2 (opinion) · GFI: mệnh đề quan hệ, mạo từ", awl: 2, rq: "TRUE/FALSE/NOT GIVEN", wt: "task2" },
+  { w: 3, focus: "Bị động & danh từ hoá; Task 1: Line/Bar chart (overview!); Speaking Part 2 cấu trúc 4 ý; Listening: bẫy đính chính",
+    test: "Cambridge IELTS 15 — Test 2", study: "OCG: Writing Task 1 (biểu đồ xu hướng), Speaking Part 2 · GFI: câu bị động, so sánh", awl: 3, rq: "matching headings", wt: "task1" },
+  { w: 4, focus: "Mạo từ, giới từ, số ít/nhiều; Reading: Matching headings; Task 2 dạng Discussion (both views)",
+    test: "Cambridge IELTS 15 — Test 3", study: "OCG: Reading (matching headings, summary completion) · VFI: unit chủ đề Giáo dục & Công việc", awl: 4, rq: "matching headings", wt: "task2" },
+  { w: 5, focus: "Câu điều kiện & đảo ngữ; Task 1: Table/Pie; Speaking Part 3 (nguyên nhân – hệ quả)",
+    test: "Cambridge IELTS 16 — Test 1", study: "OCG: Writing Task 1 (bảng, biểu đồ tròn), Speaking Part 3 · GFI: câu điều kiện, đảo ngữ", awl: 5, rq: "summary completion", wt: "task1" },
+  { w: 6, focus: "Liên kết & mạch lạc (cohesion, reference, substitution); Reading: Matching information; Listening Section 3; Task 2 Problem–Solution",
+    test: "Cambridge IELTS 16 — Test 2", study: "OCG: Listening Part 3, Reading matching information · VFI: unit Môi trường & Công nghệ", awl: 6, rq: "matching information", wt: "task2" },
+  { w: 7, focus: "Collocation theo chủ đề; Task 1: Process & Map; Speaking Part 2 kể chuyện tự nhiên",
+    test: "Cambridge IELTS 17 — Test 1", study: "OCG: Writing Task 1 (quy trình, bản đồ) · VFI: unit Sức khoẻ & Xã hội · GFI: mệnh đề phân từ", awl: 7, rq: "multiple choice", wt: "task1" },
+  { w: 8, focus: "Hedging & ngôn ngữ học thuật; Listening Section 4 (bài giảng); Task 2 Advantages–Disadvantages; FULL TEST #1",
+    test: "Cambridge IELTS 17 — Test 2 (thi thử đủ 4 kỹ năng)", study: "OCG: Listening Part 4 · VFI: unit Khoa học & Truyền thông", awl: 8, rq: "sentence completion", wt: "task2" },
+  { w: 9, focus: "Chiến lược 60 phút Reading; Writing tốc độ 40 phút; idioms tự nhiên (không lạm dụng); FULL TEST #2",
+    test: "Cambridge IELTS 18 — Test 1 & 2", study: "OCG: bài thi thử trong sách · làm lại câu sai từ tuần 2–8", awl: 9, rq: "mixed", wt: "task2" },
+  { w: 10, focus: "Sửa lỗi lặp lại trong Sổ lỗi sai; paraphrase nâng cao; Speaking Part 3 phản biện; FULL TEST #3",
+    test: "Cambridge IELTS 19 — Test 1 & 2", study: "Đối chiếu bài viết với band descriptors 7–8–9 · bài mẫu band 8–9 trong Cambridge IELTS", awl: 10, rq: "mixed", wt: "task2" },
+  { w: 11, focus: "Thi thử điều kiện thật 2 lần; chấm Writing kỹ từng tiêu chí; ôn từ vựng SRS cường độ cao",
+    test: "Cambridge IELTS 20 — Test 1 & 2", study: "Ôn toàn bộ AWL + Sổ lỗi sai", awl: null, rq: "mixed", wt: "task2" },
+  { w: 12, focus: "Giảm tải, ôn lỗi sai, ngủ đủ; 1 full test đầu tuần; Speaking nhẹ mỗi ngày; chuẩn bị giấy tờ thi",
+    test: "Cambridge IELTS 20 — Test 3", study: "Đọc lại ghi chú, không học kiến thức mới", awl: null, rq: "mixed", wt: "task1" },
 ];
 
-// Khung ngày ~2.5h. Ngày 7 mỗi tuần là ôn tập + thi thử nhỏ.
+// Khung ngày ~2.5h. Ngày 1–3: làm đề thật của tuần theo từng phần; ngày 4–6: luyện dạng bài; ngày 7: ôn & thi thử.
 export function dailyTasks(week, dayOfWeek) {
+  const W = WEEKS[week - 1];
+  const vocab = { id: "vocab", label: `Từ vựng SRS: ôn thẻ đến hạn + từ mới${W.awl ? ` (AWL Sublist ${W.awl})` : ""}`, min: 20, link: "#/vocab" };
   if (dayOfWeek === 7) {
     return [
       { id: "review", label: "Ôn toàn bộ thẻ từ vựng đến hạn", min: 20, link: "#/vocab" },
       { id: "mistakes", label: "Đọc lại Sổ lỗi sai, viết lại 5 câu đã sửa", min: 20, link: "#/mistakes" },
-      { id: week >= 8 ? "fulltest" : "minitest", label: week >= 8 ? "Thi thử ĐỀ THẬT: 1 Listening + 1 Reading (Cambridge/chính thức) + 1 Task 2 + Speaking giám khảo AI" : "Mini test: 1 Reading + 1 Listening AI tạo", min: week >= 8 ? 150 : 60, link: week >= 8 ? "#/real" : "#/reading" },
+      week >= 8
+        ? { id: "fulltest", label: `Thi thử ĐỀ THẬT đủ 4 kỹ năng: ${W.test} — Listening + Reading (chấm ở trang Đề thật), Writing Task 1+2, Speaking với giám khảo AI`, min: 170, link: "#/real" }
+        : { id: "minitest", label: "Mini test: 1 Reading + 1 Listening AI tạo, bấm giờ nghiêm", min: 60, link: "#/reading" },
     ];
   }
-  const writing = dayOfWeek % 2 === 1
+  const rl = {
+    1: { id: "listening", label: `Đề thật — Listening: ${W.test}. Chấm ở trang Đề thật, nghe lại & chép chính tả câu sai`, min: 45, link: "#/real" },
+    2: { id: "reading", label: `Đề thật — Reading Passage 1–2: ${W.test}`, min: 45, link: "#/real" },
+    3: { id: "reading", label: `Đề thật — Reading Passage 3: ${W.test}. Nhập phiếu 40 câu để quy đổi band`, min: 35, link: "#/real" },
+    4: { id: "listening", label: "Listening: 1 section AI tạo + chép chính tả đoạn sai", min: 30, link: "#/listening" },
+    5: { id: "reading", label: `Reading: 1 passage AI tạo, tập trung dạng "${W.rq}"`, min: 30, link: "#/reading" },
+    6: { id: "listening", label: "Listening: 1 section AI tạo (Section 3–4) + chép chính tả", min: 30, link: "#/listening" },
+  }[dayOfWeek];
+  const t2 = dayOfWeek % 2 === 1 || (W.wt === "task2" && dayOfWeek === 6);
+  const writing = t2
     ? { id: "writing", label: week <= 2 ? "Writing Task 2 (không giới hạn giờ) + AI chấm" : "Writing Task 2 — 40 phút + AI chấm", min: 50, link: "#/writing" }
     : { id: "writing", label: "Writing Task 1 — 20 phút + AI chấm", min: 30, link: "#/writing" };
-  const rl = dayOfWeek % 2 === 1
-    ? { id: "reading", label: "Reading: 1 passage AI tạo (20 phút) + phân tích câu sai", min: 35, link: "#/reading" }
-    : { id: "listening", label: "Listening: 1 section AI tạo + nghe lại chép chính tả đoạn sai", min: 35, link: "#/listening" };
   return [
-    { id: "vocab", label: "Từ vựng SRS: ôn thẻ đến hạn + 15 từ mới", min: 20, link: "#/vocab" },
+    vocab,
+    { id: "study", label: `Giáo trình: ${W.study}`, min: 30, link: "#/books" },
     rl,
     writing,
-    { id: "speaking", label: "Speaking: 3 câu Part 1 + 1 cue card, ghi âm & AI chấm", min: 30, link: "#/speaking" },
-    { id: "tutor", label: "Hỏi gia sư AI 1 điểm ngữ pháp trong trọng tâm tuần", min: 15, link: "#/tutor" },
+    { id: "speaking", label: "Speaking: 3 câu Part 1 + 1 cue card, ghi âm & AI chấm", min: 25, link: "#/speaking" },
   ];
 }
+
+// ---------------- GIÁO TRÌNH ----------------
+export const BOOKS = [
+  {
+    group: "Giáo trình chính (bắt buộc)",
+    items: [
+      { name: "Cambridge IELTS 15–20 Academic (Cambridge University Press & Assessment)", role: "Đề thi THẬT đã dùng, mỗi cuốn 4 test kèm đáp án, audio, bài viết mẫu. Nguồn luyện đề chính từ tuần 2 và toàn bộ thi thử.", when: "Tuần 2–12", url: "https://www.cambridge.org/ielts" },
+      { name: "The Official Cambridge Guide to IELTS (Pauline Cullen, Amanda French, Vanessa Jakeman)", role: "Giáo trình chính thức đủ 4 kỹ năng: chiến lược từng dạng câu hỏi, bài tập và 8 bài thi thử. Dùng làm xương sống phần 'Giáo trình' mỗi ngày.", when: "Tuần 1–10", url: "https://www.cambridge.org/ielts" },
+    ],
+  },
+  {
+    group: "Sách bổ trợ (chọn theo điểm yếu sau test đầu vào)",
+    items: [
+      { name: "Grammar for IELTS (Diana Hopkins, Pauline Cullen — Cambridge)", role: "Ngữ pháp theo ngữ cảnh IELTS, có bài tập Writing/Speaking. Dùng nếu GRA < 7.", when: "Tuần 1–7", url: "https://www.cambridge.org/ielts" },
+      { name: "Cambridge Vocabulary for IELTS Advanced (Pauline Cullen)", role: "Từ vựng theo chủ đề cho band 6.5+, có collocation và bài tập. Dùng nếu Lexical Resource < 7.", when: "Tuần 4–8", url: "https://www.cambridge.org/ielts" },
+      { name: "Mindset for IELTS (Cambridge)", role: "Khoá học theo cấp độ; bản Level 3 hướng tới band 7.5+. Thay thế OCG nếu bạn thích học theo khoá có lộ trình sẵn.", when: "Tuỳ chọn", url: "https://www.cambridge.org/ielts" },
+      { name: "Collins Listening for IELTS / Get Ready for IELTS", role: "Chỉ dùng nếu test đầu vào dưới 5.5 — nền tảng trước khi vào OCG.", when: "Trước tuần 1 nếu cần", url: "https://www.collins.co.uk/" },
+    ],
+  },
+  {
+    group: "Tài nguyên chính thức & miễn phí",
+    items: [
+      { name: "IELTS Writing Band Descriptors (cập nhật 05/2023)", role: "Tiêu chí chấm Writing chính thức — giám khảo AI trong app chấm theo bảng này. Đọc để biết band 7, 8, 9 khác nhau ở đâu.", when: "Tuần 1, đọc lại tuần 10", url: "https://ielts.org/cdn/ielts-downloadable-assets/ielts-guidance-and-support/ielts-guides/ielts-writing-band-descriptors.pdf" },
+      { name: "IELTS Speaking Band Descriptors", role: "Tiêu chí chấm Speaking chính thức (4 tiêu chí, gồm Pronunciation).", when: "Tuần 1", url: "https://ielts.org/cdn/ielts-downloadable-assets/ielts-guidance-and-support/ielts-guides/ielts-speaking-band-descriptors.pdf" },
+      { name: "Academic Word List — Averil Coxhead (Victoria University of Wellington)", role: "570 họ từ học thuật xuất hiện nhiều nhất trong văn bản đại học, chia 10 sublist. App có sẵn Sublist 1–2; mỗi tuần học 1 sublist.", when: "Tuần 1–10", url: "https://www.wgtn.ac.nz/lals/resources/academicwordlist" },
+      { name: "Write & Improve (Cambridge)", role: "Chấm Writing tự động miễn phí của Cambridge — dùng để đối chiếu với giám khảo AI.", when: "Bất kỳ", url: "https://writeandimprove.com/" },
+      { name: "Đề làm quen & đề mẫu chính thức (IDP, ielts.org, British Council)", role: "Xem trang Đề thật.", when: "Tuần 1", url: "#/real" },
+      { name: "TED Talks", role: "Nghe bài giảng thật cho Listening Section 4 và lấy ý cho Speaking Part 3: nghe không phụ đề → nghe có phụ đề → shadowing 2 phút.", when: "Hằng ngày, 15 phút khi đi đường", url: "https://www.ted.com/talks" },
+    ],
+  },
+];
 
 // ---------------- TỪ VỰNG HỌC THUẬT ----------------
 // [từ, loại, nghĩa tiếng Việt, ví dụ, collocation]
@@ -197,7 +253,140 @@ const RAW_VOCAB = [
   ["at the expense of", "phr", "đánh đổi bằng", "Growth came at the expense of the environment.", "—"],
 ];
 
-export const VOCAB = RAW_VOCAB.map(([word, pos, vi, ex, col], i) => ({ id: "w" + i, word, pos, vi, ex, col }));
+// Academic Word List (Coxhead, 2000) — 60 dạng từ thường gặp nhất của Sublist 1 và 2
+// (theo danh sách của Victoria University of Wellington). Nghĩa và ví dụ tự soạn.
+// [từ, loại, nghĩa, ví dụ]
+const AWL = {
+  1: [
+    ["analysis", "n", "sự phân tích", "A detailed analysis of the data revealed a clear trend."],
+    ["approach", "n/v", "cách tiếp cận; tiếp cận", "We need a new approach to tackling obesity."],
+    ["area", "n", "khu vực; lĩnh vực", "Healthcare is an area that requires more funding."],
+    ["assessment", "n", "sự đánh giá", "Continuous assessment may be fairer than final exams."],
+    ["assume", "v", "cho rằng, giả định", "Many people assume that technology always saves time."],
+    ["authority", "n", "chính quyền; thẩm quyền", "Local authorities should improve public transport."],
+    ["available", "adj", "sẵn có", "Free healthcare should be available to everyone."],
+    ["benefit", "n/v", "lợi ích; có lợi", "Regular exercise benefits both body and mind."],
+    ["concept", "n", "khái niệm", "The concept of lifelong learning is gaining popularity."],
+    ["consistent", "adj", "nhất quán, ổn định", "The figures remained consistent throughout the decade."],
+    ["constitutional", "adj", "thuộc hiến pháp", "Free speech is a constitutional right in many countries."],
+    ["context", "n", "bối cảnh", "Words should be learned in context, not in isolation."],
+    ["contract", "n", "hợp đồng", "Many young workers are on short-term contracts."],
+    ["create", "v", "tạo ra", "Tourism can create thousands of jobs."],
+    ["data", "n", "dữ liệu", "The data show a sharp rise in online sales."],
+    ["definition", "n", "định nghĩa", "There is no single definition of success."],
+    ["derived", "adj/v", "bắt nguồn từ", "Much of the country's income is derived from oil."],
+    ["distribution", "n", "sự phân bố/phân phối", "The distribution of wealth is highly unequal."],
+    ["economic", "adj", "thuộc kinh tế", "Economic growth does not always improve well-being."],
+    ["environment", "n", "môi trường", "Children learn best in a supportive environment."],
+    ["established", "adj/v", "được thành lập; lâu đời", "The university was established in 1820."],
+    ["estimate", "n/v", "ước tính", "It is estimated that 30% of food is wasted."],
+    ["evidence", "n", "bằng chứng", "There is little evidence that the policy works."],
+    ["export", "n/v", "xuất khẩu", "Rice exports rose significantly in 2020."],
+    ["factors", "n", "các yếu tố", "Several factors contribute to rising house prices."],
+    ["financial", "adj", "tài chính", "Students often face financial difficulties."],
+    ["formula", "n", "công thức", "There is no simple formula for happiness."],
+    ["function", "n/v", "chức năng; vận hành", "The main function of schools is to educate."],
+    ["identified", "v", "được xác định", "Researchers identified three main causes."],
+    ["income", "n", "thu nhập", "Low-income families spend more on food proportionally."],
+    ["indicate", "v", "cho thấy", "The figures indicate a steady decline."],
+    ["individual", "n/adj", "cá nhân", "Individuals should take responsibility for their health."],
+    ["interpretation", "n", "sự diễn giải", "The results are open to interpretation."],
+    ["involved", "adj/v", "liên quan, tham gia", "Parents should be involved in their children's education."],
+    ["issues", "n", "vấn đề", "Climate change is one of the most pressing issues today."],
+    ["labour", "n", "lao động", "Cheap labour attracts foreign investment."],
+    ["legal", "adj", "hợp pháp; thuộc pháp luật", "The legal driving age varies between countries."],
+    ["legislation", "n", "luật pháp, đạo luật", "New legislation bans smoking in public places."],
+    ["major", "adj", "lớn, chủ yếu", "Traffic is a major cause of air pollution."],
+    ["method", "n", "phương pháp", "Online learning is an effective teaching method."],
+    ["occur", "v", "xảy ra", "Most accidents occur close to home."],
+    ["percent", "n", "phần trăm", "Sales rose by 15 percent in 2019."],
+    ["period", "n", "giai đoạn", "Over the period shown, exports doubled."],
+    ["policy", "n", "chính sách", "The government introduced a new housing policy."],
+    ["principle", "n", "nguyên tắc", "Equality is a fundamental principle of democracy."],
+    ["procedure", "n", "thủ tục, quy trình", "The application procedure is too complicated."],
+    ["process", "n/v", "quá trình; xử lý", "The diagram illustrates the process of making paper."],
+    ["required", "adj/v", "bắt buộc, cần thiết", "A degree is required for most professional jobs."],
+    ["research", "n/v", "nghiên cứu", "Recent research suggests that sleep improves memory."],
+    ["response", "n", "phản hồi, phản ứng", "The public response to the plan was positive."],
+    ["role", "n", "vai trò", "Teachers play a crucial role in society."],
+    ["section", "n", "phần, mục", "A large section of the population lives in poverty."],
+    ["sector", "n", "khu vực, ngành", "The service sector employs most of the workforce."],
+    ["significant", "adj", "đáng kể, quan trọng", "There was a significant increase in car ownership."],
+    ["similar", "adj", "tương tự", "The two countries show similar patterns."],
+    ["source", "n", "nguồn", "Coal remains the main source of energy."],
+    ["specific", "adj", "cụ thể", "The essay lacks specific examples."],
+    ["structure", "n/v", "cấu trúc", "A clear structure makes an essay easier to follow."],
+    ["theory", "n", "lý thuyết", "In theory, the plan should reduce traffic."],
+    ["variables", "n", "biến số", "The study controlled for variables such as age and income."],
+  ],
+  2: [
+    ["achieve", "v", "đạt được", "Few countries have achieved full employment."],
+    ["acquisition", "n", "sự tiếp thu; thâu tóm", "Language acquisition is easier for young children."],
+    ["administration", "n", "chính quyền; quản lý", "The new administration cut education spending."],
+    ["affect", "v", "ảnh hưởng", "Air pollution affects millions of people."],
+    ["appropriate", "adj", "phù hợp", "Punishment should be appropriate to the crime."],
+    ["aspects", "n", "khía cạnh", "Technology affects almost every aspect of our lives."],
+    ["assistance", "n", "sự hỗ trợ", "Poor countries need financial assistance."],
+    ["categories", "n", "hạng mục, loại", "Expenses were divided into four categories."],
+    ["chapter", "n", "chương", "Each chapter focuses on a different skill."],
+    ["commission", "n", "uỷ ban; tiền hoa hồng", "A commission was set up to investigate the issue."],
+    ["community", "n", "cộng đồng", "Libraries are valuable community resources."],
+    ["complex", "adj", "phức tạp", "Climate change is a complex problem."],
+    ["computer", "n", "máy tính", "Computer skills are essential in modern workplaces."],
+    ["conclusion", "n", "kết luận", "In conclusion, the benefits outweigh the drawbacks."],
+    ["conduct", "v/n", "tiến hành; hạnh kiểm", "A survey was conducted among 500 students."],
+    ["consequences", "n", "hậu quả", "Deforestation has serious consequences for wildlife."],
+    ["construction", "n", "sự xây dựng", "The construction of the bridge took five years."],
+    ["consumer", "n", "người tiêu dùng", "Consumers are increasingly shopping online."],
+    ["credit", "n", "tín dụng; công nhận", "Easy credit encourages people to overspend."],
+    ["cultural", "adj", "thuộc văn hoá", "Museums preserve cultural heritage."],
+    ["design", "n/v", "thiết kế", "Good urban design reduces crime."],
+    ["distinction", "n", "sự phân biệt", "There is a clear distinction between education and training."],
+    ["elements", "n", "yếu tố, thành phần", "Trust is a key element of any relationship."],
+    ["equation", "n", "phương trình", "Cost is only one part of the equation."],
+    ["evaluation", "n", "sự đánh giá", "Teacher evaluation should include student feedback."],
+    ["features", "n", "đặc điểm", "The main features of the graph are summarised below."],
+    ["final", "adj", "cuối cùng", "The final stage involves packaging the product."],
+    ["focus", "n/v", "tập trung", "Schools should focus more on practical skills."],
+    ["impact", "n/v", "tác động", "Social media has a huge impact on young people."],
+    ["injury", "n", "chấn thương", "Wearing helmets reduces the risk of head injury."],
+    ["institute", "n", "viện", "The institute conducts research on renewable energy."],
+    ["investment", "n", "sự đầu tư", "Investment in infrastructure creates jobs."],
+    ["items", "n", "mục, món đồ", "Food items accounted for 20% of spending."],
+    ["journal", "n", "tạp chí chuyên ngành", "The study was published in a medical journal."],
+    ["maintenance", "n", "sự bảo trì", "Old buildings require costly maintenance."],
+    ["normal", "adj", "bình thường", "It is normal for teenagers to challenge authority."],
+    ["obtained", "v", "thu được", "The data were obtained from a national survey."],
+    ["participation", "n", "sự tham gia", "Participation in sport declined among adults."],
+    ["perceived", "adj/v", "được nhận thức", "Nursing is often perceived as a female profession."],
+    ["positive", "adj", "tích cực", "Tourism can have a positive effect on local economies."],
+    ["potential", "n/adj", "tiềm năng", "Solar energy has enormous potential."],
+    ["previous", "adj", "trước đó", "Sales were higher than in the previous year."],
+    ["primary", "adj", "chính; tiểu học", "The primary cause of the problem is poverty."],
+    ["purchase", "n/v", "mua; giao dịch mua", "Most purchases are now made online."],
+    ["range", "n", "phạm vi, loạt", "Students can choose from a wide range of courses."],
+    ["region", "n", "vùng", "The northern region has the highest rainfall."],
+    ["regulations", "n", "quy định", "Stricter regulations are needed to protect workers."],
+    ["relevant", "adj", "liên quan, thích đáng", "Make sure your examples are relevant to the question."],
+    ["resident", "n", "cư dân", "Local residents opposed the new airport."],
+    ["resources", "n", "tài nguyên, nguồn lực", "Natural resources are being used up rapidly."],
+    ["restricted", "adj", "bị hạn chế", "Access to the area is restricted."],
+    ["security", "n", "an ninh; sự an toàn", "Job security is more important to many than salary."],
+    ["sought", "v", "tìm kiếm (quá khứ của seek)", "The company sought to reduce its costs."],
+    ["select", "v", "chọn lọc", "Candidates are selected on the basis of merit."],
+    ["site", "n", "địa điểm", "The site was converted into a public park."],
+    ["strategies", "n", "chiến lược", "Effective strategies are needed to reduce waste."],
+    ["survey", "n/v", "khảo sát", "A recent survey found that most people support the ban."],
+    ["text", "n", "văn bản", "Read the text and answer the questions."],
+    ["traditional", "adj", "truyền thống", "Traditional skills are dying out."],
+    ["transfer", "n/v", "chuyển giao", "Technology transfer helps developing countries."],
+  ],
+};
+
+export const VOCAB = [
+  ...RAW_VOCAB.map(([word, pos, vi, ex, col], i) => ({ id: "w" + i, word, pos, vi, ex, col, deck: "Chủ đề IELTS" })),
+  ...Object.entries(AWL).flatMap(([n, list]) => list.map(([word, pos, vi, ex]) => ({ id: `awl${n}-${word}`, word, pos, vi, ex, col: "—", deck: `AWL Sublist ${n}` }))),
+];
 
 // ---------------- ĐỀ WRITING ----------------
 export const WRITING_PROMPTS = {
